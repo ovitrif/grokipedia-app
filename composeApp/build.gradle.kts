@@ -39,6 +39,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.compose.webview.multiplatform)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -75,5 +76,10 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+
+    // Use Compose BOM for Android
+    val composeBom = platform(libs.androidx.compose.bom)
+    "androidMainImplementation"(composeBom)
+    "debugImplementation"(composeBom)
 }
 

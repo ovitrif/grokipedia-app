@@ -2,9 +2,28 @@
 
 Unofficial app for Grokipedia, so you can forget about Wokipedia!
 
+A Compose Multiplatform mobile application that provides a native wrapper for the Grokipedia website, available on both Android and iOS platforms.
+
+## Features
+
+- 🌐 Full WebView integration displaying [Grokipedia.org](https://grokipedia.org)
+- 📱 Native Android and iOS support
+- 🎨 Material 3 design with loading indicators
+- ⬅️ Back button navigation support
+- 🚀 Built with latest Compose Multiplatform (1.9.4)
+- 📦 Uses Compose BOM for consistent dependency versioning
+
+## Technology Stack
+
+- **Compose Multiplatform**: 1.9.4
+- **Kotlin**: 2.2.20
+- **Android Gradle Plugin**: 8.5.2
+- **WebView Library**: [compose-webview-multiplatform](https://github.com/KevinnZou/compose-webview-multiplatform) 2.0.3
+- **Compose BOM**: 2025.10.01
+
 ---
 
-This is a Kotlin Multiplatform project targeting Android, iOS.
+This is a Kotlin Multiplatform project targeting Android and iOS.
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
