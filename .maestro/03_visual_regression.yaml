@@ -1,0 +1,38 @@
+appId: io.github.grokipedia
+---
+# Visual Regression Test: Capture screenshots for baseline comparison
+#
+# This test creates screenshots that can be compared over time to detect
+# unintended UI changes.
+#
+# Usage:
+# - First run: Creates baseline screenshots
+# - Subsequent runs: Compare against baseline to detect changes
+#
+# Screenshot comparison can be done:
+# - Manually (visual inspection)
+# - Automated (using image diff tools in CI/CD)
+# - Via Maestro Cloud (automatically)
+
+- launchApp
+- assertVisible: "Grokipedia"
+
+# Wait for full page load
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# Capture initial load state
+- takeScreenshot: visual_baseline_initial
+
+# Wait a moment to ensure content is stable
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Capture fully loaded state
+- takeScreenshot: visual_baseline_loaded
+
+# Scroll down to capture different parts of the page
+- scroll
+
+# Capture after scroll
+- takeScreenshot: visual_baseline_scrolled
