@@ -57,6 +57,9 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        
+        // Android instrumentation test runner
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -81,5 +84,17 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     "androidMainImplementation"(composeBom)
     "debugImplementation"(composeBom)
+    
+    // Android instrumentation testing dependencies
+    "androidTestImplementation"(composeBom)
+    "androidTestImplementation"("androidx.compose.ui:ui-test-junit4")
+    "androidTestImplementation"("androidx.test.ext:junit:1.1.5")
+    "androidTestImplementation"("androidx.test:runner:1.5.2")
+    "androidTestImplementation"("androidx.test:rules:1.5.0")
+    "androidTestImplementation"("androidx.test.espresso:espresso-web:3.5.1")
+    "androidTestImplementation"("androidx.test.uiautomator:uiautomator:2.3.0")
+    
+    // Test manifest for Compose testing
+    "debugImplementation"("androidx.compose.ui:ui-test-manifest")
 }
 
