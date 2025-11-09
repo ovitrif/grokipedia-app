@@ -22,7 +22,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     MaterialTheme {
-        val webViewState = rememberWebViewState("https://grokipedia.org")
+        val webViewState = rememberWebViewState("https://grokipedia.com/")
         val navigator = rememberWebViewNavigator()
 
         Box(
