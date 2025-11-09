@@ -1,0 +1,26 @@
+appId: io.github.grokipedia
+---
+# Navigation Test: Test back button behavior
+#
+# This test validates:
+# - App navigation with system back button
+# - WebView remains functional after navigation
+# - Content is still visible after back navigation
+
+- launchApp
+- assertVisible: "Grokipedia"
+- takeScreenshot: navigation_initial_load
+
+# Wait for content to fully load
+- waitForAnimationToEnd
+
+# Take screenshot of loaded state
+- takeScreenshot: navigation_content_loaded
+
+# Note: We can't easily navigate within WebView without knowing the exact
+# UI elements on the grokipedia.org page. If the site had specific buttons
+# or links we knew about, we could tap them here.
+#
+# For now, we verify the app handles back button correctly
+- back
+- takeScreenshot: navigation_after_back

@@ -1,0 +1,12 @@
+appId: io.github.grokipedia
+---
+# Smoke Test: Launch app and verify WebView content is visible
+#
+# This test validates:
+# - App launches without crashing
+# - WebView loads and displays content
+# - Basic UI elements are visible
+
+- launchApp
+- assertVisible: "Grokipedia"
+- takeScreenshot: smoke_test_launch
