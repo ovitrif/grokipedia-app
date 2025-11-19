@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,16 +5,21 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version "2.2.20"
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
+    // Suppress expect/actual classes Beta warning
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -25,12 +29,12 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("androidx.datastore:datastore-preferences:1.1.1")
+            implementation(libs.androidx.datastore.preferences.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -45,7 +49,7 @@ kotlin {
             implementation(libs.compose.webview.multiplatform)
             implementation(libs.haze)
             implementation(libs.androidx.datastore.preferences)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+            implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -63,7 +67,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-        
+
         // Android instrumentation test runner
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -90,17 +94,16 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
     "androidMainImplementation"(composeBom)
     "debugImplementation"(composeBom)
-    
-    // Android instrumentation testing dependencies
-    "androidTestImplementation"(composeBom)
-    "androidTestImplementation"("androidx.compose.ui:ui-test-junit4")
-    "androidTestImplementation"("androidx.test.ext:junit:1.1.5")
-    "androidTestImplementation"("androidx.test:runner:1.5.2")
-    "androidTestImplementation"("androidx.test:rules:1.5.0")
-    "androidTestImplementation"("androidx.test.espresso:espresso-web:3.5.1")
-    "androidTestImplementation"("androidx.test.uiautomator:uiautomator:2.3.0")
-    
-    // Test manifest for Compose testing
-    "debugImplementation"("androidx.compose.ui:ui-test-manifest")
-}
 
+    // Android instrumentation testing dependencies
+    "androidInstrumentedTestImplementation"(composeBom)
+    "androidInstrumentedTestImplementation"(libs.androidx.compose.ui.test.junit4)
+    "androidInstrumentedTestImplementation"(libs.androidx.testExt.junit)
+    "androidInstrumentedTestImplementation"(libs.androidx.test.runner)
+    "androidInstrumentedTestImplementation"(libs.androidx.test.rules)
+    "androidInstrumentedTestImplementation"(libs.androidx.espresso.web)
+    "androidInstrumentedTestImplementation"(libs.androidx.test.uiautomator)
+
+    // Test manifest for Compose testing
+    "debugImplementation"(libs.androidx.compose.ui.test.manifest)
+}

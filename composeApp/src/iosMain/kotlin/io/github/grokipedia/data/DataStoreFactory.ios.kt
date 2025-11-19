@@ -18,7 +18,7 @@ actual fun createDataStore(): DataStore<Preferences> {
         error = null
     )
     val path = requireNotNull(documentDirectory?.path) + "/grokipedia_prefs.preferences_pb"
-    
+
     return androidx.datastore.preferences.core.PreferenceDataStoreFactory.createWithPath(
         produceFile = { path.toPath() }
     )

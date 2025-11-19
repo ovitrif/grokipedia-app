@@ -25,29 +25,29 @@ actual fun FocusableWebView(
     onWebViewReady: () -> Unit
 ) {
     val context = LocalContext.current
-    
+
     val webView = remember {
         WebView(context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            
+
             // Enable JavaScript
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.setSupportMultipleWindows(false)
-            
+
             // Enable touch and focus
             isFocusable = true
             isFocusableInTouchMode = true
-            
+
             // Set WebViewClient
             webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                     return false
                 }
-                
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     // Request focus when page finishes loading
@@ -55,22 +55,22 @@ actual fun FocusableWebView(
                     println("[WebView] Page loaded: $url, requesting focus")
                 }
             }
-            
+
             // Load initial URL
             loadUrl(state.lastLoadedUrl ?: "https://grokipedia.com/")
         }
     }
-    
+
     // Navigator is already integrated with the state
     // We just need to keep the WebView in sync
-    
+
     DisposableEffect(Unit) {
         onWebViewReady()
         onDispose {
             webView.destroy()
         }
     }
-    
+
     AndroidView(
         factory = { webView },
         modifier = modifier,

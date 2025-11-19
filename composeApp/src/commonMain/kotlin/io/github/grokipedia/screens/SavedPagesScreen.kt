@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.haze
-import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.hazeEffect
 import io.github.grokipedia.data.SavedPage
 import io.github.grokipedia.data.SavedPagesRepository
 import kotlinx.coroutines.launch
@@ -45,7 +45,7 @@ fun SavedPagesScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .haze(state = hazeState)
+                .hazeSource(state = hazeState)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(top = 56.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
@@ -87,7 +87,7 @@ fun SavedPagesScreen(
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .height(56.dp)
-                .hazeChild(
+                .hazeEffect(
                     state = hazeState,
                     style = HazeStyle(
                         backgroundColor = Color(0xFF141414),
@@ -105,7 +105,7 @@ fun SavedPagesScreen(
                     tint = Color.White
                 )
             }
-            
+
             Text(
                 text = "Saved Pages",
                 style = MaterialTheme.typography.titleLarge,
@@ -146,9 +146,9 @@ private fun SavedPageItem(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             Text(
                 text = page.url,
                 style = MaterialTheme.typography.bodySmall,
@@ -157,7 +157,7 @@ private fun SavedPageItem(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        
+
         IconButton(onClick = onDeleteClick) {
             Icon(
                 imageVector = Icons.Default.Close,
@@ -166,7 +166,7 @@ private fun SavedPageItem(
             )
         }
     }
-    
+
     HorizontalDivider(
         modifier = Modifier.padding(horizontal = 16.dp),
         color = Color.Gray.copy(alpha = 0.2f)

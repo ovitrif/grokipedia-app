@@ -5,23 +5,31 @@ This directory contains Android instrumentation tests for the Grokipedia app usi
 ## Test Suites
 
 ### 1. AppSmokeTest.kt
+
 **Purpose**: Basic smoke test to verify app launches and WebView is displayed.
 
 **Tests**:
-- `appLaunches_andWebViewIsDisplayed()`: Verifies the app launches without crashing and the WebView container is visible.
+
+- `appLaunches_andWebViewIsDisplayed()`: Verifies the app launches without crashing and the WebView container is
+  visible.
 
 ### 2. LoadingIndicatorTest.kt
+
 **Purpose**: Tests for loading indicator behavior (extensible for future enhancements).
 
 **Tests**:
+
 - `webViewContainer_isAlwaysPresent()`: Verifies WebView container exists even during loading.
 
-**Note**: Contains commented-out test for loading indicator visibility that can be enabled when loading indicator gets a testTag.
+**Note**: Contains commented-out test for loading indicator visibility that can be enabled when loading indicator gets a
+testTag.
 
 ### 3. LogAnalysisTest.kt
+
 **Purpose**: Demonstrates log capture and analysis capabilities.
 
 **Tests**:
+
 - `app_doesNotCrashOnLaunch()`: Verifies no fatal exceptions occur during app launch.
 - `app_logsNoErrorsDuringWebViewLoad()`: Checks for errors during WebView initialization.
 - `logcat_canBeCaptured()`: Demonstrates log capture capability.
@@ -51,16 +59,18 @@ This directory contains Android instrumentation tests for the Grokipedia app usi
 
 - An Android emulator must be running OR a physical device connected
 - The emulator/device must have:
-  - API level 24+ (minSdk)
-  - Internet connectivity (for WebView to load content)
+    - API level 24+ (minSdk)
+    - Internet connectivity (for WebView to load content)
 
 ## Test Output
 
 ### Success
+
 - Tests will pass with green checkmarks
 - JUnit reports available at: `composeApp/build/reports/androidTests/connected/`
 
 ### Failure
+
 - Failed tests show red X with failure message
 - Logcat output captured in test reports
 - Screenshots captured on failure (when configured)
@@ -97,12 +107,14 @@ These tests are designed to run in CI/CD pipelines:
 ## Log Collection
 
 Tests use `UiDevice.executeShellCommand()` to:
+
 - Clear logs before tests (`logcat -c`)
 - Capture logs after tests (`logcat -d`)
 - Filter logs by tag or severity
 - Analyze logs for errors
 
 Example:
+
 ```kotlin
 val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 device.executeShellCommand("logcat -c")
@@ -113,9 +125,11 @@ val logs = device.executeShellCommand("logcat -d -s YourTag:*")
 ## Test Tags
 
 The app uses these test tags for UI testing:
+
 - `webview`: The main WebView component
 
 To add more test tags:
+
 ```kotlin
 Modifier.testTag("your_tag_name")
 ```
@@ -123,7 +137,9 @@ Modifier.testTag("your_tag_name")
 ## Troubleshooting
 
 ### Tests fail with "No instrumentation runner found"
+
 **Solution**: Ensure `testInstrumentationRunner` is set in `build.gradle.kts`:
+
 ```kotlin
 defaultConfig {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -131,7 +147,9 @@ defaultConfig {
 ```
 
 ### Tests timeout waiting for WebView
+
 **Solution**: Increase timeout or check internet connectivity:
+
 ```kotlin
 composeTestRule.waitForIdle()
 // or
@@ -139,13 +157,17 @@ Thread.sleep(5000) // Give WebView time to load
 ```
 
 ### Cannot capture logs
+
 **Solution**: Ensure UiAutomator dependency is added:
+
 ```kotlin
 androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
 ```
 
 ### Emulator too slow
+
 **Solution**:
+
 - Use x86_64 architecture
 - Enable hardware acceleration
 - Increase emulator RAM in AVD settings
@@ -162,6 +184,7 @@ androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
 ## Future Enhancements
 
 Potential test additions:
+
 - [ ] WebView back navigation tests
 - [ ] Error page handling tests
 - [ ] Network connectivity loss/recovery tests

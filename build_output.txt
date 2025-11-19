@@ -1,0 +1,71 @@
+Calculating task graph as no cached configuration is available for tasks: clean :composeApp:assembleDebug
+Type-safe project accessors is an incubating feature.
+> Task :composeApp:preBuild UP-TO-DATE
+> Task :composeApp:preDebugBuild UP-TO-DATE
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:cleanIosSimulatorArm64Test UP-TO-DATE
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:cleanAllTests UP-TO-DATE
+> Task :composeApp:clean
+> Task :composeApp:convertXmlValueResourcesForAndroidMain NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForAndroidDebug NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain
+> Task :composeApp:copyNonXmlValueResourcesForAndroidDebug NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForAndroidMain NO-SOURCE
+> Task :composeApp:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :composeApp:generateComposeResClass
+> Task :composeApp:debugAssetsCopyForAGP NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForAndroidDebug NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForAndroidMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain
+> Task :composeApp:generateResourceAccessorsForAndroidDebug NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForAndroidMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain
+> Task :composeApp:generateResourceAccessorsForCommonMain
+> Task :composeApp:generateActualResourceCollectorsForAndroidMain
+> Task :composeApp:copyDebugComposeResourcesToAndroidAssets
+> Task :composeApp:javaPreCompileDebug FROM-CACHE
+> Task :composeApp:desugarDebugFileDependencies FROM-CACHE
+> Task :composeApp:generateDebugResValues FROM-CACHE
+> Task :composeApp:createDebugCompatibleScreenManifests
+> Task :composeApp:writeDebugAppMetadata
+> Task :composeApp:generateDebugResources FROM-CACHE
+> Task :composeApp:validateSigningDebug
+> Task :composeApp:writeDebugSigningConfigVersions
+> Task :composeApp:extractDeepLinksDebug FROM-CACHE
+> Task :composeApp:packageDebugResources FROM-CACHE
+> Task :composeApp:processDebugNavigationResources FROM-CACHE
+> Task :composeApp:mergeDebugShaders
+> Task :composeApp:mergeDebugJniLibFolders
+> Task :composeApp:compileDebugShaders NO-SOURCE
+> Task :composeApp:generateDebugAssets UP-TO-DATE
+> Task :composeApp:compileDebugNavigationResources FROM-CACHE
+> Task :composeApp:parseDebugLocalResources FROM-CACHE
+> Task :composeApp:checkDebugDuplicateClasses
+> Task :composeApp:mergeDebugResources FROM-CACHE
+> Task :composeApp:mapDebugSourceSetPaths
+> Task :composeApp:checkDebugAarMetadata
+> Task :composeApp:mergeDebugNativeLibs
+> Task :composeApp:mergeDebugAssets
+> Task :composeApp:stripDebugDebugSymbols
+> Task :composeApp:compressDebugAssets FROM-CACHE
+> Task :composeApp:mergeLibDexDebug FROM-CACHE
+> Task :composeApp:processDebugMainManifest FROM-CACHE
+> Task :composeApp:processDebugManifest FROM-CACHE
+> Task :composeApp:processDebugManifestForPackage FROM-CACHE
+> Task :composeApp:processDebugResources FROM-CACHE
+> Task :composeApp:mergeExtDexDebug FROM-CACHE
+> Task :composeApp:compileDebugKotlinAndroid FROM-CACHE
+> Task :composeApp:compileDebugJavaWithJavac NO-SOURCE
+> Task :composeApp:processDebugJavaRes
+> Task :composeApp:dexBuilderDebug FROM-CACHE
+> Task :composeApp:mergeProjectDexDebug FROM-CACHE
+> Task :composeApp:mergeDebugJavaResource
+> Task :composeApp:packageDebug
+> Task :composeApp:assembleDebug
+> Task :composeApp:createDebugApkListingFileRedirect
+
+BUILD SUCCESSFUL in 8s
+46 actionable tasks: 25 executed, 20 from cache, 1 up-to-date
+Configuration cache entry stored.

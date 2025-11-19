@@ -14,13 +14,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        
+
         // Enable WebView debugging
         WebView.setWebContentsDebuggingEnabled(true)
-        
+
         // Initialize DataStore
         initDataStore(this)
-        
+
         // Initialize KeyboardManager
         initKeyboardManager(this)
 

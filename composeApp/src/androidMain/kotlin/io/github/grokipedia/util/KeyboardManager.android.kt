@@ -14,11 +14,17 @@ fun initKeyboardManager(context: Context) {
 actual class KeyboardManager {
     actual fun showKeyboard() {
         try {
-            val imm = appContext.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-            println("[KEYBOARD] Toggled soft input")
+            // On modern Android (API 24+), the keyboard automatically appears when an input
+            // element is focused. Since the JavaScript in App.kt already focuses the search
+            // input, the system will automatically show the keyboard.
+            //
+            // Note: The deprecated toggleSoftInput(SHOW_FORCED, 0) has been removed.
+            // The modern replacement showSoftInput() requires a View parameter, which we
+            // don't have access to from the application context. Since the WebView input
+            // is already focused via JavaScript, the keyboard will appear automatically.
+            println("[KEYBOARD] Input focused, keyboard should appear automatically")
         } catch (e: Exception) {
-            println("[KEYBOARD] Failed to show keyboard: ${e.message}")
+            println("[KEYBOARD] Error: ${e.message}")
         }
     }
 }

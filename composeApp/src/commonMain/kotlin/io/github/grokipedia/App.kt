@@ -1,6 +1,5 @@
 package io.github.grokipedia
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -42,13 +41,14 @@ import com.multiplatform.webview.web.rememberWebViewNavigator
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
-import dev.chrisbanes.haze.haze
-import dev.chrisbanes.haze.hazeChild
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.hazeEffect
 import io.github.grokipedia.data.SavedPagesRepository
 import io.github.grokipedia.data.createDataStore
 import io.github.grokipedia.screens.SavedPagesScreen
 import io.github.grokipedia.ui.FocusableWebView
 import io.github.grokipedia.util.KeyboardManager
+import io.github.grokipedia.util.PlatformBackHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -79,12 +79,13 @@ fun App() {
     MaterialTheme(colorScheme = DarkColorScheme) {
         var currentScreen by remember { mutableStateOf(Screen.WebView) }
         val repository = remember { SavedPagesRepository(createDataStore()) }
-        
+
         when (currentScreen) {
             Screen.WebView -> WebViewScreen(
                 repository = repository,
                 onNavigateToSavedPages = { currentScreen = Screen.SavedPages }
             )
+
             Screen.SavedPages -> SavedPagesScreen(
                 repository = repository,
                 onNavigateBack = { currentScreen = Screen.WebView },
@@ -107,15 +108,15 @@ fun WebViewScreen(
     val hazeState = remember { HazeState() }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    
+
     var menuExpanded by remember { mutableStateOf(false) }
     var isCurrentPageSaved by remember { mutableStateOf(false) }
     var hasAutoFocusedSearch by remember { mutableStateOf(false) }
     val keyboardManager = remember { KeyboardManager() }
-    
-    val isHomePage = webViewState.lastLoadedUrl?.contains("grokipedia.com") == true && 
-                      webViewState.lastLoadedUrl?.let { it == "https://grokipedia.com/" || it == "https://grokipedia.com" } == true
-    
+
+    val isHomePage = webViewState.lastLoadedUrl?.contains("grokipedia.com") == true &&
+            webViewState.lastLoadedUrl?.let { it == "https://grokipedia.com/" || it == "https://grokipedia.com" } == true
+
     // Check if current page is saved
     LaunchedEffect(webViewState.lastLoadedUrl) {
         webViewState.lastLoadedUrl?.let { url ->
@@ -123,14 +124,14 @@ fun WebViewScreen(
             isCurrentPageSaved = savedPages.any { it.url == url }
         }
     }
-    
+
     // Auto-focus search input on homepage after page loads
     LaunchedEffect(webViewState.isLoading, isHomePage) {
         if (!webViewState.isLoading && isHomePage && !hasAutoFocusedSearch) {
             println("[FOCUS] Page loaded, will attempt focus in 2 seconds...")
             // Wait for page to fully render and be visible to user
             delay(2000)
-            
+
             println("[FOCUS] Executing focus script...")
             // JavaScript to focus the search input with mobile keyboard support
             val focusScript = """
@@ -254,189 +255,187 @@ fun WebViewScreen(
                     }
                 })();
             """.trimIndent()
-            
+
             navigator.evaluateJavaScript(focusScript)
             println("[FOCUS] Script executed")
-            
+
             // Show keyboard after JavaScript focuses the input
             delay(500)
             keyboardManager.showKeyboard()
             println("[FOCUS] Keyboard show requested")
-            
+
             hasAutoFocusedSearch = true
         }
-        
+
         // Reset flag when navigating away from homepage
         if (!isHomePage) {
             hasAutoFocusedSearch = false
         }
     }
-    
+
     // Handle back button
-    BackHandler {
-        if (navigator.canGoBack) {
-            navigator.navigateBack()
-        }
+    PlatformBackHandler(enabled = navigator.canGoBack) {
+        navigator.navigateBack()
     }
 
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF141414))
+    ) {
+        // WebView with haze source and top padding for the topbar
+        FocusableWebView(
+            state = webViewState,
+            navigator = navigator,
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF141414))
-        ) {
-            // WebView with haze source and top padding for the topbar
-            FocusableWebView(
-                state = webViewState,
-                navigator = navigator,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .haze(state = hazeState)
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(top = 56.dp) // Reserve space for topbar
-                    .testTag("webview"),
-                captureBackPresses = true,
-                onWebViewReady = {
-                    // WebView is ready - will trigger focus logic
-                }
-            )
+                .hazeSource(state = hazeState)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(top = 56.dp) // Reserve space for topbar
+                .testTag("webview"),
+            captureBackPresses = true,
+            onWebViewReady = {
+                // WebView is ready - will trigger focus logic
+            }
+        )
 
-            // Transparent topbar with haze blur effect
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .height(56.dp)
-                    .hazeChild(
-                        state = hazeState,
-                        style = HazeStyle(
-                            backgroundColor = Color(0xFF141414),
-                            blurRadius = 20.dp,
-                            tint = HazeTint(color = Color(0xFF141414).copy(alpha = 0.7f))
-                        )
+        // Transparent topbar with haze blur effect
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .height(56.dp)
+                .hazeEffect(
+                    state = hazeState,
+                    style = HazeStyle(
+                        backgroundColor = Color(0xFF141414),
+                        blurRadius = 20.dp,
+                        tint = HazeTint(color = Color(0xFF141414).copy(alpha = 0.7f))
                     )
-                    .align(Alignment.TopCenter),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Back button (hidden on home page)
-                if (!isHomePage && navigator.canGoBack) {
-                    IconButton(
-                        onClick = {
-                            navigator.navigateBack()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
+                )
+                .align(Alignment.TopCenter),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Back button (hidden on home page)
+            if (!isHomePage && navigator.canGoBack) {
+                IconButton(
+                    onClick = {
+                        navigator.navigateBack()
                     }
-                } else {
-                    // Empty space to maintain layout
-                    Spacer(modifier = Modifier.width(48.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
                 }
-                
-                Spacer(modifier = Modifier.weight(1f))
-                
-                // Dropdown menu button
-                Box {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Menu",
-                            tint = Color.White
-                        )
-                    }
-                    
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        // Home menu item
-                        DropdownMenuItem(
-                            text = { Text("Home") },
-                            onClick = {
-                                menuExpanded = false
-                                scope.launch {
-                                    navigator.loadUrl("https://grokipedia.com/")
-                                }
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Home,
-                                    contentDescription = "Home"
-                                )
-                            }
-                        )
-                        
-                        // Saved Pages menu item
-                        DropdownMenuItem(
-                            text = { Text("Saved Pages") },
-                            onClick = {
-                                menuExpanded = false
-                                onNavigateToSavedPages()
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Bookmarks,
-                                    contentDescription = "Saved Pages"
-                                )
-                            }
-                        )
-                        
-                        // Save/Unsave page menu item
-                        DropdownMenuItem(
-                            text = { 
-                                Text(if (isCurrentPageSaved) "Unsave Page" else "Save Page") 
-                            },
-                            onClick = {
-                                menuExpanded = false
-                                scope.launch {
-                                    val url = webViewState.lastLoadedUrl ?: return@launch
-                                    val title = webViewState.pageTitle ?: url
-                                    
-                                    if (isCurrentPageSaved) {
-                                        repository.removePage(url)
-                                        snackbarHostState.showSnackbar("Page removed")
-                                    } else {
-                                        repository.savePage(url, title)
-                                        snackbarHostState.showSnackbar("Page saved")
-                                    }
-                                    
-                                    // Update saved state
-                                    val savedPages = repository.savedPages.first()
-                                    isCurrentPageSaved = savedPages.any { it.url == url }
-                                }
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = if (isCurrentPageSaved) 
-                                        Icons.Filled.Star 
-                                    else 
-                                        Icons.Outlined.StarOutline,
-                                    contentDescription = if (isCurrentPageSaved) "Unsave" else "Save"
-                                )
-                            }
-                        )
-                    }
-                }
+            } else {
+                // Empty space to maintain layout
+                Spacer(modifier = Modifier.width(48.dp))
             }
 
-            // Show loading indicator while the page is loading
-            if (webViewState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Dropdown menu button
+            Box {
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Menu",
+                        tint = Color.White
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    // Home menu item
+                    DropdownMenuItem(
+                        text = { Text("Home") },
+                        onClick = {
+                            menuExpanded = false
+                            scope.launch {
+                                navigator.loadUrl("https://grokipedia.com/")
+                            }
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Home"
+                            )
+                        }
+                    )
+
+                    // Saved Pages menu item
+                    DropdownMenuItem(
+                        text = { Text("Saved Pages") },
+                        onClick = {
+                            menuExpanded = false
+                            onNavigateToSavedPages()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Bookmarks,
+                                contentDescription = "Saved Pages"
+                            )
+                        }
+                    )
+
+                    // Save/Unsave page menu item
+                    DropdownMenuItem(
+                        text = {
+                            Text(if (isCurrentPageSaved) "Unsave Page" else "Save Page")
+                        },
+                        onClick = {
+                            menuExpanded = false
+                            scope.launch {
+                                val url = webViewState.lastLoadedUrl ?: return@launch
+                                val title = webViewState.pageTitle ?: url
+
+                                if (isCurrentPageSaved) {
+                                    repository.removePage(url)
+                                    snackbarHostState.showSnackbar("Page removed")
+                                } else {
+                                    repository.savePage(url, title)
+                                    snackbarHostState.showSnackbar("Page saved")
+                                }
+
+                                // Update saved state
+                                val savedPages = repository.savedPages.first()
+                                isCurrentPageSaved = savedPages.any { it.url == url }
+                            }
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = if (isCurrentPageSaved)
+                                    Icons.Filled.Star
+                                else
+                                    Icons.Outlined.StarOutline,
+                                contentDescription = if (isCurrentPageSaved) "Unsave" else "Save"
+                            )
+                        }
+                    )
+                }
             }
-            
-            // Snackbar for notifications
-            SnackbarHost(
-                hostState = snackbarHostState,
+        }
+
+        // Show loading indicator while the page is loading
+        if (webViewState.isLoading) {
+            CircularProgressIndicator(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .padding(16.dp),
+                color = MaterialTheme.colorScheme.primary
             )
         }
+
+        // Snackbar for notifications
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
+    }
 }

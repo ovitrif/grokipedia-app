@@ -30,7 +30,7 @@ Grokipedia is a **Compose Multiplatform** mobile application that provides a nat
 **IMPORTANT**: For every new feature or UI change, you MUST follow this workflow:
 
 ### 1. Write the UI Test First
-Before implementing any feature, create an instrumentation test in `composeApp/src/androidTest/kotlin/io/github/grokipedia/`:
+Before implementing any feature, create an instrumentation test in `composeApp/src/androidInstrumentedTest/kotlin/io/github/grokipedia/`:
 
 ```kotlin
 @Test
@@ -241,7 +241,7 @@ grokipedia-app/
 │       │       ├── data/DataStoreFactory.android.kt
 │       │       ├── ui/FocusableWebView.android.kt
 │       │       └── util/KeyboardManager.android.kt
-│       ├── androidTest/     # Android instrumentation tests
+│       ├── androidInstrumentedTest/     # Android instrumentation tests
 │       │   └── kotlin/io/github/grokipedia/
 │       │       ├── AppSmokeTest.kt
 │       │       ├── LoadingIndicatorTest.kt
@@ -366,7 +366,7 @@ Currently no unit tests. Good candidates:
 - URL validation
 - JSON serialization/deserialization
 
-### Instrumentation Tests (androidTest/)
+### Instrumentation Tests (androidInstrumentedTest/)
 - **AppSmokeTest**: Basic launch and WebView visibility
 - **LoadingIndicatorTest**: Progress indicator during page load
 - **LogAnalysisTest**: Verifies no critical errors in logs
@@ -382,7 +382,7 @@ Currently no unit tests. Good candidates:
 
 ### Adding a New Feature (Follow TDD Workflow Above!)
 
-1. **Write the test first** in `composeApp/src/androidTest/kotlin/io/github/grokipedia/`
+1. **Write the test first** in `composeApp/src/androidInstrumentedTest/kotlin/io/github/grokipedia/`
 2. **Implement the feature** with proper `testTag` modifiers
 3. **Run the test** and verify it passes
 4. **Monitor ADB logs** for any issues

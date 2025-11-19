@@ -39,19 +39,19 @@ class SavedPagesRepository(private val dataStore: DataStore<Preferences>) {
             } catch (e: Exception) {
                 mutableListOf()
             }
-            
+
             // Remove if already exists (to avoid duplicates)
             currentPages.removeAll { it.url == url }
-            
+
             // Add new page at the beginning with current timestamp
             val timestamp = currentPages.maxOfOrNull { it.timestamp }?.plus(1) ?: 1L
             currentPages.add(0, SavedPage(url, title, timestamp))
-            
+
             // Keep only last 100 pages
             if (currentPages.size > 100) {
                 currentPages.subList(100, currentPages.size).clear()
             }
-            
+
             preferences[savedPagesKey] = json.encodeToString(currentPages)
         }
     }
@@ -64,7 +64,7 @@ class SavedPagesRepository(private val dataStore: DataStore<Preferences>) {
             } catch (e: Exception) {
                 mutableListOf()
             }
-            
+
             currentPages.removeAll { it.url == url }
             preferences[savedPagesKey] = json.encodeToString(currentPages)
         }
