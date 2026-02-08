@@ -1,30 +1,33 @@
 package io.github.grokipedia
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Bookmarks
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Bookmarks
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -125,6 +128,24 @@ fun WebViewScreen(
         }
     }
 
+    // Inject CSS to add top padding for topbar area (content scrolls behind transparent topbar)
+    LaunchedEffect(webViewState.isLoading, webViewState.lastLoadedUrl) {
+        if (!webViewState.isLoading) {
+            val topbarOffsetCss = """
+                (function() {
+                    var style = document.createElement('style');
+                    style.id = 'grokipedia-topbar-offset';
+                    style.textContent = 'body { padding-top: 80px !important; }';
+                    var existing = document.getElementById('grokipedia-topbar-offset');
+                    if (existing) existing.remove();
+                    document.head.appendChild(style);
+                    console.log('[CSS] Injected topbar offset padding');
+                })();
+            """.trimIndent()
+            navigator.evaluateJavaScript(topbarOffsetCss)
+        }
+    }
+
     // Auto-focus search input on homepage after page loads
     LaunchedEffect(webViewState.isLoading, isHomePage) {
         if (!webViewState.isLoading && isHomePage && !hasAutoFocusedSearch) {
@@ -134,26 +155,24 @@ fun WebViewScreen(
 
             println("[FOCUS] Executing focus script...")
             // JavaScript to focus the search input with mobile keyboard support
+            // Simplified focus script - platform handles viewport resize via imePadding()
             val focusScript = """
                 (function() {
                     console.log('[FOCUS-JS] Starting focus attempt...');
-                    
+
                     function tryFocusSearch() {
                         console.log('[FOCUS-JS] Looking for search input...');
-                        
-                        // Try multiple selectors
+
                         var selectors = [
                             'input[type="search"]',
                             'input[type="text"]',
                             'input[name*="search"]',
-                            'input[name*="Search"]',
                             'input[placeholder*="Search"]',
-                            'input[placeholder*="search"]',
                             'input.search',
                             '#search',
                             'input'
                         ];
-                        
+
                         var searchInput = null;
                         for (var i = 0; i < selectors.length; i++) {
                             searchInput = document.querySelector(selectors[i]);
@@ -162,93 +181,38 @@ fun WebViewScreen(
                                 break;
                             }
                         }
-                        
+
                         if (!searchInput) {
                             console.log('[FOCUS-JS] No input found!');
                             return false;
                         }
-                        
+
                         console.log('[FOCUS-JS] Input found, attempting focus...');
-                        console.log('[FOCUS-JS] Input tag:', searchInput.tagName);
-                        console.log('[FOCUS-JS] Input type:', searchInput.type);
-                        console.log('[FOCUS-JS] Input placeholder:', searchInput.placeholder);
-                        
+
                         // Remove readonly if present
                         searchInput.removeAttribute('readonly');
-                        
-                        // Scroll into view
+
+                        // Scroll into view - platform resize handles proper centering
                         searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
+
                         // Focus and click
                         searchInput.focus();
-                        console.log('[FOCUS-JS] Called focus()');
-                        
                         searchInput.click();
-                        console.log('[FOCUS-JS] Called click()');
-                        
-                        // Try to trigger touch event
-                        try {
-                            var touchStart = new TouchEvent('touchstart', {
-                                bubbles: true,
-                                cancelable: true,
-                                view: window,
-                                touches: []
-                            });
-                            searchInput.dispatchEvent(touchStart);
-                            console.log('[FOCUS-JS] Dispatched touch event');
-                        } catch(e) {
-                            console.log('[FOCUS-JS] Touch event failed:', e);
-                        }
-                        
-                        // Try mouse event as fallback
-                        var mouseDown = new MouseEvent('mousedown', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
-                        });
-                        searchInput.dispatchEvent(mouseDown);
-                        console.log('[FOCUS-JS] Dispatched mouse event');
-                        
-                        // Final focus attempt with value test
+                        console.log('[FOCUS-JS] Called focus() and click()');
+
+                        // Verify focus after short delay
                         setTimeout(function() {
-                            searchInput.focus();
-                            
-                            // Set a temporary value to test if input is truly focused
-                            var testValue = '';
-                            searchInput.value = testValue;
-                            
-                            // Check if we can actually type
-                            var inputEvent = new InputEvent('input', {
-                                bubbles: true,
-                                cancelable: true,
-                                data: testValue
-                            });
-                            searchInput.dispatchEvent(inputEvent);
-                            
-                            console.log('[FOCUS-JS] Final focus attempt, value:', searchInput.value);
                             console.log('[FOCUS-JS] Active element:', document.activeElement.tagName);
                             console.log('[FOCUS-JS] Is focused:', document.activeElement === searchInput);
-                            
-                            // Listen for input to verify typing works
-                            searchInput.addEventListener('input', function(e) {
-                                console.log('[FOCUS-JS] Input received! Value:', searchInput.value);
-                            });
-                            
-                            searchInput.addEventListener('keydown', function(e) {
-                                console.log('[FOCUS-JS] Key down:', e.key);
-                            });
                         }, 200);
-                        
-                        console.log('[FOCUS-JS] Focus complete');
+
                         return true;
                     }
-                    
-                    // Try immediately
+
+                    // Try immediately, retry if needed
                     if (!tryFocusSearch()) {
-                        console.log('[FOCUS-JS] First attempt failed, retrying in 500ms...');
                         setTimeout(function() {
                             if (!tryFocusSearch()) {
-                                console.log('[FOCUS-JS] Second attempt failed, retrying in 1000ms...');
                                 setTimeout(tryFocusSearch, 1000);
                             }
                         }, 500);
@@ -281,142 +245,116 @@ fun WebViewScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .background(Color(0xFF141414))
     ) {
-        // WebView with haze source and top padding for the topbar
+        // WebView with insets so content doesn't render behind status bar
         FocusableWebView(
             state = webViewState,
             navigator = navigator,
-            modifier = Modifier
-                .fillMaxSize()
-                .hazeSource(state = hazeState)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(top = 56.dp) // Reserve space for topbar
-                .testTag("webview"),
             captureBackPresses = true,
             onWebViewReady = {
                 // WebView is ready - will trigger focus logic
-            }
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .testTag("webview")
         )
 
-        // Transparent topbar with haze blur effect
-        Row(
+        // Bottom right navigation
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .height(56.dp)
-                .hazeEffect(
-                    state = hazeState,
-                    style = HazeStyle(
-                        backgroundColor = Color(0xFF141414),
-                        blurRadius = 20.dp,
-                        tint = HazeTint(color = Color(0xFF141414).copy(alpha = 0.7f))
-                    )
-                )
-                .align(Alignment.TopCenter),
-            verticalAlignment = Alignment.CenterVertically
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(end = (25.5).dp, bottom = 16.dp)
         ) {
-            // Back button (hidden on home page)
-            if (!isHomePage && navigator.canGoBack) {
-                IconButton(
-                    onClick = {
-                        navigator.navigateBack()
-                    }
+            // Back button
+            if (navigator.canGoBack) {
+                FilledTonalIconButton(
+                    onClick = { navigator.navigateBack() },
+                    modifier = Modifier.size(28.dp),
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    )
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        modifier = Modifier.size(12.dp)
                     )
                 }
-            } else {
-                // Empty space to maintain layout
-                Spacer(modifier = Modifier.width(48.dp))
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Home button
+            FilledTonalIconButton(
+                onClick = {
+                    scope.launch {
+                        navigator.loadUrl("https://grokipedia.com/")
+                    }
+                },
+                modifier = Modifier.size(28.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
 
-            // Dropdown menu button
-            Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Menu",
-                        tint = Color.White
-                    )
-                }
+            // Save/Unsave button
+            FilledTonalIconButton(
+                onClick = {
+                    scope.launch {
+                        val url = webViewState.lastLoadedUrl ?: return@launch
+                        val title = webViewState.pageTitle ?: url
 
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
-                ) {
-                    // Home menu item
-                    DropdownMenuItem(
-                        text = { Text("Home") },
-                        onClick = {
-                            menuExpanded = false
-                            scope.launch {
-                                navigator.loadUrl("https://grokipedia.com/")
-                            }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Home"
-                            )
+                        if (isCurrentPageSaved) {
+                            repository.removePage(url)
+                            snackbarHostState.showSnackbar("Page removed")
+                        } else {
+                            repository.savePage(url, title)
+                            snackbarHostState.showSnackbar("Page saved")
                         }
-                    )
 
-                    // Saved Pages menu item
-                    DropdownMenuItem(
-                        text = { Text("Saved Pages") },
-                        onClick = {
-                            menuExpanded = false
-                            onNavigateToSavedPages()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Bookmarks,
-                                contentDescription = "Saved Pages"
-                            )
-                        }
-                    )
+                        val savedPages = repository.savedPages.first()
+                        isCurrentPageSaved = savedPages.any { it.url == url }
+                    }
+                },
+                modifier = Modifier.size(28.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.StarOutline,
+                    contentDescription = if (isCurrentPageSaved) "Unsave" else "Save",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
 
-                    // Save/Unsave page menu item
-                    DropdownMenuItem(
-                        text = {
-                            Text(if (isCurrentPageSaved) "Unsave Page" else "Save Page")
-                        },
-                        onClick = {
-                            menuExpanded = false
-                            scope.launch {
-                                val url = webViewState.lastLoadedUrl ?: return@launch
-                                val title = webViewState.pageTitle ?: url
-
-                                if (isCurrentPageSaved) {
-                                    repository.removePage(url)
-                                    snackbarHostState.showSnackbar("Page removed")
-                                } else {
-                                    repository.savePage(url, title)
-                                    snackbarHostState.showSnackbar("Page saved")
-                                }
-
-                                // Update saved state
-                                val savedPages = repository.savedPages.first()
-                                isCurrentPageSaved = savedPages.any { it.url == url }
-                            }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = if (isCurrentPageSaved)
-                                    Icons.Filled.Star
-                                else
-                                    Icons.Outlined.StarOutline,
-                                contentDescription = if (isCurrentPageSaved) "Unsave" else "Save"
-                            )
-                        }
-                    )
-                }
+            // Saved Pages button
+            FilledTonalIconButton(
+                onClick = { onNavigateToSavedPages() },
+                modifier = Modifier.size(28.dp),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Bookmarks,
+                    contentDescription = "Saved Pages",
+                    modifier = Modifier.size(12.dp)
+                )
             }
         }
 

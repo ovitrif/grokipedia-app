@@ -14,5 +14,5 @@ expect fun FocusableWebView(
     navigator: WebViewNavigator,
     modifier: Modifier = Modifier,
     captureBackPresses: Boolean = true,
-    onWebViewReady: () -> Unit = {}
+    onWebViewReady: () -> Unit = {},
 )

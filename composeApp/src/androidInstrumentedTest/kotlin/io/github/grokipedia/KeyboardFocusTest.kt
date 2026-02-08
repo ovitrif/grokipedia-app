@@ -40,15 +40,36 @@ class KeyboardFocusTest {
 
         println("[TEST] Checking if keyboard is visible...")
 
-        // Check if keyboard is showing by looking for the IME
-        val isKeyboardShowing =
-            device.wait(Until.findObject(By.pkg("com.google.android.inputmethod.latin")), 1000) != null ||
-                    device.wait(
-                        Until.findObject(By.res("com.google.android.inputmethod.latin:id/keyboard_view")),
-                        1000
-                    ) != null
+        // Check if keyboard is showing by looking for common IME packages/resources
+        val imePackages = listOf(
+            "com.google.android.inputmethod.latin", // Gboard
+            "com.android.inputmethod.latin",        // AOSP
+            "com.samsung.android.honeyboard",       // Samsung
+            "com.microsoft.swiftkey",               // SwiftKey
+            "com.baidu.input_mi"                    // Baidu on some devices
+        )
+
+        fun waitForKeyboard(timeoutMs: Long): Boolean {
+            val start = System.currentTimeMillis()
+            while (System.currentTimeMillis() - start < timeoutMs) {
+                // Try package matches
+                for (pkg in imePackages) {
+                    if (device.wait(Until.findObject(By.pkg(pkg)), 500) != null) return true
+                }
+                // Try common resource id from Gboard
+                if (device.wait(Until.findObject(By.res("com.google.android.inputmethod.latin:id/keyboard_view")), 500) != null) return true
+                // Small delay before next attempt
+                Thread.sleep(200)
+            }
+            return false
+        }
+
+        val isKeyboardShowing = waitForKeyboard(timeoutMs = 10_000)
 
         println("[TEST] Keyboard showing: $isKeyboardShowing")
+
+        // Now assert the keyboard is visible to make the test meaningful
+        assert(isKeyboardShowing) { "Expected software keyboard to be visible but it was not detected" }
 
         // Type "bitcoin" using key codes
         println("[TEST] Typing 'bitcoin'...")
