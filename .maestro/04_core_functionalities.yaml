@@ -1,0 +1,53 @@
+appId: io.github.grokipedia
+---
+# Core Functionalities Test
+# Covers:
+# 1. Startup + focus input & show soft keyboard after page load + delay
+# 2. Favorites feature
+
+- launchApp
+
+# --- Part 1: Startup & Focus Verification ---
+# Verify app loads
+- assertVisible: "Grokipedia"
+
+# Wait for the auto-focus logic
+# App implementation has ~2.5s delay sequence after load
+- extendedWaitUntil:
+    visible: "Grokipedia"
+    timeout: 5000
+
+# Verify input is focused by typing text
+# "inputText" types into the currently focused element.
+# If the search input was successfully auto-focused, this text will appear in it.
+- inputText: "Test Search"
+
+# Verify the text was typed (implies focus was successful)
+- assertVisible: "Test Search"
+- takeScreenshot: startup_focus_keyboard
+
+# --- Part 2: Favorites Feature Verification ---
+
+# Open Menu
+- tapOn: "Menu"
+
+# Save the current page
+- tapOn: "Save Page"
+- assertVisible: "Page saved"
+# Wait for snackbar to fade
+- extendedWaitUntil:
+    notVisible: "Page saved"
+    timeout: 3000
+
+# Navigate to Saved Pages
+- tapOn: "Menu"
+- tapOn: "Saved Pages"
+
+# Verify Saved Pages Screen content
+- assertVisible: "Saved Pages"
+- assertVisible: "Grokipedia" # Expecting the homepage title to be saved
+- takeScreenshot: favorites_list
+
+# Clean up: Delete the saved page
+- tapOn: "Delete"
+- assertVisible: "Page removed"

@@ -1,0 +1,82 @@
+# Verification Test Template for Claude Code
+# Copy and modify this template when testing new features
+# Each step includes a screenshot for visual verification
+#
+# Usage: maestro test .maestro/00_verification_template.yaml
+# Or via verification script: ./scripts/run-verification.sh .maestro/00_verification_template.yaml
+
+appId: io.github.grokipedia
+---
+
+# === SETUP ===
+- clearState  # Start fresh
+- launchApp
+- takeScreenshot: 01_app_launched
+
+# === WAIT FOR INITIAL LOAD ===
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: 02_initial_load_complete
+
+# === VERIFY CORE UI ELEMENTS ===
+# Verify WebView is visible (shows Grokipedia content)
+- assertVisible:
+    text: ".*[Gg]rokipedia.*"
+    optional: false
+- takeScreenshot: 03_webview_content_visible
+
+# === VERIFY TOPBAR ===
+# Menu button should be visible
+- assertVisible:
+    id: "menu_button"
+    optional: true
+- takeScreenshot: 04_topbar_visible
+
+# === TEST MENU INTERACTION ===
+# Open dropdown menu
+- tapOn:
+    text: ".*"
+    index: 0
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: 05_after_menu_tap
+
+# === NAVIGATION TEST ===
+# Test back button if available
+- back
+- takeScreenshot: 06_after_back
+
+# === FINAL STATE ===
+- waitForAnimationToEnd
+- takeScreenshot: 99_final_state
+
+# === TEMPLATE SECTIONS (uncomment as needed) ===
+
+# --- Test text input ---
+# - tapOn:
+#     id: "search_input"
+# - inputText: "test query"
+# - takeScreenshot: input_entered
+
+# --- Test scrolling ---
+# - scroll
+# - takeScreenshot: after_scroll
+
+# --- Test specific button ---
+# - tapOn:
+#     text: "Button Text"
+# - takeScreenshot: after_button_tap
+
+# --- Assert element exists ---
+# - assertVisible:
+#     id: "element_id"
+
+# --- Assert text content ---
+# - assertVisible:
+#     text: "Expected text"
+
+# --- Wait for specific element ---
+# - extendedWaitUntil:
+#     visible:
+#       id: "loading_complete"
+#     timeout: 10000
