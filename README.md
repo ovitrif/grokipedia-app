@@ -53,6 +53,19 @@ in your IDE’s toolbar or build it directly from the terminal:
 To build and run the development version of the iOS app, use the run configuration from the run widget
 in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
+
+## Testing
+
+This project uses a multi-layered testing strategy including Unit Tests, Android Instrumentation Tests, and Maestro End-to-End tests.
+
+For detailed instructions on running tests, see [Testing Guide](docs/TESTING_GUIDE.md).
+
+### Quick Start (E2E)
+To run the core functionalities test:
+```bash
+maestro test .maestro/04_core_functionalities.yaml
+```
+
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…

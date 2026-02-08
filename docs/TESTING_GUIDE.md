@@ -174,4 +174,49 @@ Based on our test run on Pixel_8_35 emulator:
 - LogAnalysisTest (4 tests): ~18s total
 - **Total suite**: ~21s
 
-Plan accordingly for CI/CD timeouts.
+
+## Running Unit Tests (Common & Android)
+
+Unit tests run on the JVM and do not require a device or emulator.
+
+```bash
+# Run all unit tests
+./gradlew test
+
+# Run common tests only
+./gradlew :composeApp:jvmTest
+```
+
+## Running Maestro E2E Tests
+
+Maestro tests run against a running app on a connected device (Android Emulator or iOS Simulator).
+
+### Prerequisites
+
+1.  Install Maestro CLI:
+    ```bash
+    curl -Ls "https://get.maestro.mobile.dev" | bash
+    ```
+2.  Ensure you have a running Android Emulator or iOS Simulator.
+3.  Build and install the app on the device (Maestro does not build the app).
+    ```bash
+    # Android
+    ./gradlew :composeApp:installDebug
+    ```
+
+### Executing Tests
+
+Run all Maestro flows:
+```bash
+maestro test .maestro/
+```
+
+Run a specific test flow:
+```bash
+maestro test .maestro/04_core_functionalities.yaml
+```
+
+Run with continuous feedback (Watch mode):
+```bash
+maestro test --watch .maestro/04_core_functionalities.yaml
+```
