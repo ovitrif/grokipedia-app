@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.roborazzi)
 }
 
 kotlin {
@@ -54,6 +55,18 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.roborazzi)
+                implementation(libs.roborazzi.compose)
+                implementation(libs.roborazzi.junit.rule)
+                implementation(libs.robolectric)
+                implementation(libs.junit)
+                implementation(libs.kotlin.testJunit)
+                implementation(libs.androidx.test.core)
+                implementation(libs.androidx.compose.ui.test.junit4)
+            }
+        }
     }
 }
 
@@ -85,6 +98,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -103,6 +121,10 @@ dependencies {
     "androidInstrumentedTestImplementation"(libs.androidx.test.rules)
     "androidInstrumentedTestImplementation"(libs.androidx.espresso.web)
     "androidInstrumentedTestImplementation"(libs.androidx.test.uiautomator)
+
+    // Unit test (Roborazzi) dependencies
+    "testImplementation"(composeBom)
+    "testImplementation"(libs.androidx.compose.ui.test.manifest)
 
     // Test manifest for Compose testing
     "debugImplementation"(libs.androidx.compose.ui.test.manifest)

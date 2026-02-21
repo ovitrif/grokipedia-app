@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -43,9 +44,12 @@ fun FindInPageBar(
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
+    val isInspection = LocalInspectionMode.current
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        if (!isInspection) {
+            focusRequester.requestFocus()
+        }
     }
 
     Row(

@@ -58,6 +58,12 @@ maestro test .maestro/04_core_functionalities.yaml
 # Debug logs
 adb logcat | grep -E "(grokipedia|FOCUS|chromium|WebView|Console|AndroidRuntime)"
 
+# Screenshot tests (Roborazzi) — no emulator needed
+./scripts/screenshot-test.sh record    # record new references
+./scripts/screenshot-test.sh verify    # verify against references
+./scripts/screenshot-test.sh compare   # generate diffs
+./gradlew :composeApp:testDebugUnitTest --tests "...ScreenshotTest"
+
 # iOS - open in Xcode
 open iosApp/iosApp.xcodeproj
 ```
@@ -178,7 +184,14 @@ composeApp/src/
 │       ├── KeyboardManager.kt        # expect/actual keyboard show/hide
 │       └── ShareManager.kt           # expect/actual platform sharing
 ├── androidMain/            # actual implementations for Android
-├── androidInstrumentedTest/ # UI tests
+├── androidInstrumentedTest/ # UI tests (instrumented, requires emulator)
+├── test/                   # JVM screenshot tests (Roborazzi, no emulator)
+│   ├── kotlin/io/github/grokipedia/screenshot/
+│   │   ├── ScreenshotTestBase.kt       # Abstract base with captureScreenshot()
+│   │   ├── TestDataStoreFactory.kt     # In-memory DataStore for tests
+│   │   └── *ScreenshotTest.kt          # Screenshot tests per composable
+│   ├── resources/robolectric.properties # Robolectric config (SDK 34)
+│   └── screenshots/                    # Git-tracked reference PNGs
 └── iosMain/                # actual implementations for iOS
 ```
 
@@ -209,6 +222,54 @@ Platform-specific code uses Kotlin Multiplatform's `expect`/`actual` pattern:
 **Initialization order**:
 - Android: `MainActivity.onCreate()` calls `initDataStore(context)`, `initKeyboardManager()`, `initShareManager()` before `App()`
 - iOS: DataStoreFactory handles paths via `NSDocumentDirectory`
+
+## Screenshot Testing (Roborazzi)
+
+JVM-based screenshot tests using Roborazzi + Robolectric. No emulator needed — runs on JVM with native graphics.
+
+### Commands
+
+```bash
+./scripts/screenshot-test.sh record    # record/update reference screenshots
+./scripts/screenshot-test.sh verify    # verify against references (CI)
+./scripts/screenshot-test.sh compare   # generate diff images
+
+# Run a specific screenshot test
+./gradlew :composeApp:testDebugUnitTest --tests "io.github.grokipedia.screenshot.TextSizeControlsScreenshotTest"
+```
+
+### Rules
+
+1. **Every visual change requires screenshot test update** — re-record references after UI modifications
+2. **New composables in `ui/` or `screens/` need a `*ScreenshotTest.kt`** in `src/test/kotlin/.../screenshot/`
+3. **Always run `./scripts/screenshot-test.sh verify` before considering visual work done**
+4. **Reference images are version-controlled** — commit updated PNGs after re-recording
+5. **Test composables in isolation** via `composeTestRule.setContent { }`, not Activity launch
+6. **For `ModalBottomSheet` composables**, extract inner content and test that directly
+7. **Test multiple themes** — at minimum dark + light variants
+8. **Every composable MUST have a `@Preview` function** — add a `@Composable @Preview private fun <Name>Preview()` for each public composable in `ui/` and `screens/`. Use `org.jetbrains.compose.ui.tooling.preview.Preview` for KMP compatibility. Provide representative sample data so the preview is useful in IDE tooling.
+
+### Writing a Screenshot Test
+
+```kotlin
+class MyComponentScreenshotTest : ScreenshotTestBase() {
+    @Test
+    fun myComponent_default() {
+        captureScreenshot("MyComponent_default") {
+            MyComponent(param1 = "value", onAction = {})
+        }
+    }
+
+    @Test
+    fun myComponent_light() {
+        captureScreenshot("MyComponent_light", colorScheme = LightColorScheme) {
+            MyComponent(param1 = "value", onAction = {})
+        }
+    }
+}
+```
+
+For screens that need DataStore repositories, use `createTestDataStore()` from `TestDataStoreFactory.kt`.
 
 ## Debugging WebView
 
