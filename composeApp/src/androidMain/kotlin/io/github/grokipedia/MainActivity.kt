@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.grokipedia.data.initDataStore
 import io.github.grokipedia.util.initKeyboardManager
+import io.github.grokipedia.util.initShareManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +24,9 @@ class MainActivity : ComponentActivity() {
 
         // Initialize KeyboardManager
         initKeyboardManager(this)
+
+        // Initialize ShareManager
+        initShareManager(this)
 
         setContent {
             App()

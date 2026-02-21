@@ -1,0 +1,85 @@
+appId: io.github.grokipedia
+---
+# Theme Switcher Test
+# Covers: Switching between dark, light, sepia, black themes via Settings
+
+- launchApp
+
+# Wait for app UI
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- takeScreenshot: 01_default_dark_theme
+
+# Open Settings via More menu
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+
+# Wait for Settings screen
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+
+# Scroll to themes
+- scroll
+
+# Select Light theme (tap on the "Light" label text)
+- tapOn: "Light"
+- takeScreenshot: 02_light_theme_selected
+
+# Go back and see the theme applied
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: 03_light_theme_webview
+
+# Open Settings again and select Sepia
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- scroll
+- tapOn: "Sepia"
+- takeScreenshot: 04_sepia_theme_selected
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: 05_sepia_theme_webview
+
+# Select Black theme
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- scroll
+- tapOn: "Black"
+- takeScreenshot: 06_black_theme_selected
+- back
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: 07_black_theme_webview
+
+# Restore Dark theme
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- scroll
+- tapOn: "Dark"
+- back
+- takeScreenshot: 08_dark_theme_restored

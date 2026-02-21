@@ -1,0 +1,45 @@
+appId: io.github.grokipedia
+---
+# Text Size Controls Test
+# Covers: Text size increase/decrease via Settings screen
+# Note: Uses Settings screen A-/A+ buttons which are larger and more testable
+# than the floating overlay controls
+
+- launchApp
+
+# Wait for app UI
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- takeScreenshot: 01_initial
+
+# Open Settings via More menu
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+
+# Verify Settings screen loaded with text size controls
+- extendedWaitUntil:
+    visible: "Text Size"
+    timeout: 5000
+- takeScreenshot: 02_settings_text_size
+
+# Increase text size using A+ button
+- tapOn: "A+"
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: 03_text_increased
+
+# Decrease text size using A- button
+- tapOn: "A-"
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: 04_text_decreased
+
+# Navigate back to see the effect on WebView
+- back
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: 05_webview_with_text_size

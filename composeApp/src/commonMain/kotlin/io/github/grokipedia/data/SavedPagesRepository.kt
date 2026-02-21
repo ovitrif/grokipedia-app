@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -71,14 +72,20 @@ class SavedPagesRepository(private val dataStore: DataStore<Preferences>) {
     }
 
     suspend fun isPageSaved(url: String): Boolean {
-        val pages = try {
-            dataStore.data.map { preferences ->
+        return try {
+            val pages = dataStore.data.map { preferences ->
                 val jsonString = preferences[savedPagesKey] ?: "[]"
                 json.decodeFromString<List<SavedPage>>(jsonString)
             }
+            pages.first().any { it.url == url }
         } catch (e: Exception) {
-            return false
+            false
         }
-        return false // TODO: implement properly with Flow
+    }
+
+    suspend fun clearAll() {
+        dataStore.edit { preferences ->
+            preferences[savedPagesKey] = "[]"
+        }
     }
 }

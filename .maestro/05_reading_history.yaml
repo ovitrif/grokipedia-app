@@ -1,0 +1,43 @@
+appId: io.github.grokipedia
+---
+# Reading History Test
+# Covers: History tracking, viewing history, clearing history
+
+- launchApp
+
+# Wait for app UI
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- takeScreenshot: 01_app_loaded
+
+# Open the More menu and navigate to History
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "History"
+    timeout: 5000
+- tapOn: "History"
+
+# Verify History screen
+- extendedWaitUntil:
+    visible: "History"
+    timeout: 5000
+- takeScreenshot: 02_history_screen
+
+# The homepage should have been recorded in history
+# Look for history entries (the Grokipedia homepage URL or title)
+- takeScreenshot: 03_history_entries
+
+# Clear all history
+- tapOn: "Clear All"
+- extendedWaitUntil:
+    visible: "History cleared"
+    timeout: 5000
+- takeScreenshot: 04_history_cleared
+
+# Verify empty state
+- assertVisible: "No browsing history yet"
+- takeScreenshot: 05_history_empty
+
+# Navigate back
+- back

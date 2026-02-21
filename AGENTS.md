@@ -12,6 +12,17 @@ Grokipedia is a **Compose Multiplatform** mobile application wrapping https://gr
 
 **Key Libraries**: compose-webview-multiplatform (WebView), haze (blur effects), DataStore Preferences (persistence)
 
+## AI Autonomy Principle
+
+This project is an experiment in autonomous AI development — the goal is a working, production-ready, store-released multiplatform app entirely developed and validated by AI.
+
+**Core rules:**
+
+1. **AI is fully responsible for self-verification.** Code is NOT done until tests pass and screenshots prove it works.
+2. **Compilation alone is never sufficient.** Every change must be verified on-device with Maestro tests, screenshots, and log analysis.
+3. **The verification loop is mandatory, not optional:** implement → test → read screenshots/logs → fix → repeat until clean.
+4. **No feature ships without evidence.** Screenshots must visually confirm correct behavior. Error logs must be clean.
+
 ## Build Requirements
 
 - Java: OpenJDK 17+
@@ -139,16 +150,33 @@ Screenshots:
 ```
 This enables direct clicking in Warp terminal for quick visual review.
 
+**Commit message suggestions**: After completing implementation work, ALWAYS suggest exactly 3 commit messages under 50 characters using the conventional commits format (e.g., `feat:`, `fix:`, `refactor:`). Present them as a numbered list for the user to pick from.
+
 ## Architecture
 
 ```
 composeApp/src/
 ├── commonMain/kotlin/io/github/grokipedia/
-│   ├── App.kt              # Main UI with WebViewScreen and navigation
-│   ├── data/               # SavedPagesRepository, DataStoreFactory (expect)
-│   ├── screens/            # SavedPagesScreen
-│   ├── ui/                 # FocusableWebView (expect)
-│   └── util/               # KeyboardManager (expect)
+│   ├── App.kt              # Main UI with WebViewScreen, navigation, and overflow sheet
+│   ├── data/
+│   │   ├── SavedPagesRepository.kt   # Favorites persistence (DataStore, max 100)
+│   │   ├── ReadingHistoryRepository.kt # Browsing history (DataStore, max 200)
+│   │   ├── TabManager.kt             # Tab state management (DataStore, max 10)
+│   │   ├── UserPreferencesRepository.kt # Settings: text size, theme, auto-focus
+│   │   └── DataStoreFactory.kt       # expect/actual DataStore creation
+│   ├── screens/
+│   │   ├── SavedPagesScreen.kt       # Saved articles list
+│   │   ├── HistoryScreen.kt          # Browsing history with clear
+│   │   ├── SettingsScreen.kt         # Preferences: reading, appearance, data, about
+│   │   └── TabSwitcherScreen.kt      # Tab grid with create/close/switch
+│   ├── ui/
+│   │   ├── FocusableWebView.kt       # expect/actual WebView wrapper
+│   │   ├── FindInPageBar.kt          # In-page search with match count + nav
+│   │   ├── TableOfContentsSheet.kt   # TOC bottom sheet from page headings
+│   │   └── TextSizeControls.kt       # A-/A+ size controls (80-160%)
+│   └── util/
+│       ├── KeyboardManager.kt        # expect/actual keyboard show/hide
+│       └── ShareManager.kt           # expect/actual platform sharing
 ├── androidMain/            # actual implementations for Android
 ├── androidInstrumentedTest/ # UI tests
 └── iosMain/                # actual implementations for iOS
@@ -160,19 +188,26 @@ Platform-specific code uses Kotlin Multiplatform's `expect`/`actual` pattern:
 - `FocusableWebView` - WebView wrapper with keyboard focus
 - `KeyboardManager` - Show/hide keyboard
 - `DataStoreFactory` - Persistent storage initialization
+- `ShareManager` - Platform share sheet (Intent on Android, UIActivityViewController on iOS)
 
 ### Key Components
 
 **App.kt** - Main entry point with:
-- Two screens: `Screen.WebView` (main), `Screen.SavedPages` (saved articles)
-- Blurred topbar using Haze library (`hazeChild` on topbar, `haze` on content)
-- Dropdown menu: Home, Save/Unsave page, Saved pages list
+- Five screens: `WebView` (main), `SavedPages`, `History`, `Settings`, `TabSwitcher`
+- Floating navigation buttons (bottom-right): More, Back, Home, Save/Unsave, Saved Pages
+- Overflow bottom sheet (More button): Share, Text Size, Find in Page, TOC, History, Tabs, Settings
+- CSS injection for theme colors, text size, and topbar offset
 - Auto-focus search on homepage (JavaScript injection after 2s delay)
+- 4 theme color schemes: Dark (default), Light, Sepia, Black
 
-**SavedPagesRepository** - DataStore-backed storage with JSON serialization, stores up to 100 `SavedPage(url, title, timestamp)` entries
+**Data Layer** - All DataStore-backed with JSON serialization:
+- `SavedPagesRepository` - Favorites (max 100 entries)
+- `ReadingHistoryRepository` - Auto-tracked browsing history (max 200)
+- `TabManager` - Multi-tab state (max 10 tabs)
+- `UserPreferencesRepository` - Text size, theme, auto-focus toggle
 
 **Initialization order**:
-- Android: `MainActivity.onCreate()` calls `initDataStore(context)` and `initKeyboardManager()` before `App()`
+- Android: `MainActivity.onCreate()` calls `initDataStore(context)`, `initKeyboardManager()`, `initShareManager()` before `App()`
 - iOS: DataStoreFactory handles paths via `NSDocumentDirectory`
 
 ## Debugging WebView

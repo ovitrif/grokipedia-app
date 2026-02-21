@@ -1,0 +1,125 @@
+appId: io.github.grokipedia
+---
+# Full Regression Test
+# Comprehensive end-to-end test covering all features
+
+- launchApp
+
+# === 1. VERIFY HOME PAGE LOADS ===
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+# Tap on empty area to dismiss auto-focus keyboard if showing
+- tapOn:
+    point: "50%,20%"
+- waitForAnimationToEnd:
+    timeout: 3000
+- takeScreenshot: 01_home_loaded
+
+# === 2. VERIFY FLOATING BUTTONS ===
+- assertVisible: "More"
+- assertVisible: "Home"
+- assertVisible: "Saved Pages"
+- takeScreenshot: 02_buttons_visible
+
+# === 3. OPEN OVERFLOW MENU ===
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Share"
+    timeout: 5000
+- assertVisible: "Text Size"
+- assertVisible: "Find in Page"
+- assertVisible: "Table of Contents"
+- assertVisible: "History"
+- assertVisible: "Tabs"
+- assertVisible: "Settings"
+- takeScreenshot: 03_overflow_menu
+
+# === 4. CHECK HISTORY ===
+- tapOn: "History"
+- extendedWaitUntil:
+    visible: "History"
+    timeout: 5000
+- takeScreenshot: 04_history_screen
+- back
+
+# Dismiss any keyboard that auto-focus may have triggered
+- tapOn:
+    point: "50%,20%"
+- waitForAnimationToEnd:
+    timeout: 2000
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 10000
+
+# === 5. SAVE/UNSAVE PAGE (star button toggles) ===
+# The star button contentDescription is "Save" or "Unsave" depending on state
+- tapOn: "^(Un)?save$"
+- takeScreenshot: 05_save_toggled
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# === 6. OPEN SAVED PAGES ===
+- tapOn: "Saved Pages"
+- extendedWaitUntil:
+    visible: "Saved Pages"
+    timeout: 5000
+- takeScreenshot: 06_saved_pages
+- back
+
+# === 7. SETTINGS (includes text size) ===
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible: "Text Size"
+    timeout: 5000
+- tapOn: "A+"
+- takeScreenshot: 07_text_size_increased
+- back
+
+# === 8. FIND IN PAGE ===
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Find in Page"
+    timeout: 5000
+- tapOn: "Find in Page"
+- extendedWaitUntil:
+    visible: "Find in page"
+    timeout: 5000
+- assertVisible: "Previous match"
+- assertVisible: "Next match"
+- takeScreenshot: 08_find_in_page
+- back
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 5000
+
+# === 9. TAB SWITCHER ===
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Tabs"
+    timeout: 5000
+- tapOn: "Tabs"
+- extendedWaitUntil:
+    visible: "New Tab"
+    timeout: 10000
+- takeScreenshot: 09_tab_switcher
+- back
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 10000
+
+# === 10. SHARE ===
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Share"
+    timeout: 5000
+- tapOn: "Share"
+- takeScreenshot: 10_share_dialog
+- back
+
+# === FINAL STATE ===
+- takeScreenshot: 99_final_state

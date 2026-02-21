@@ -1,0 +1,49 @@
+appId: io.github.grokipedia
+---
+# Settings Screen Test
+# Covers: Settings navigation and content verification
+
+- launchApp
+
+# Wait for app UI
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+
+# Open More menu -> Settings
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- tapOn: "Settings"
+
+# Verify Settings screen title
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 5000
+- takeScreenshot: 01_settings_screen
+
+# Verify Reading section
+- assertVisible: "Text Size"
+- assertVisible: "Auto-focus Search"
+- takeScreenshot: 02_settings_reading
+
+# Scroll down to see more sections
+- scroll
+- takeScreenshot: 03_settings_scrolled
+
+# Verify theme options text labels
+- assertVisible: "Dark"
+- assertVisible: "Light"
+- assertVisible: "Sepia"
+- assertVisible: "Black"
+- takeScreenshot: 04_settings_themes
+
+# Verify data section
+- assertVisible: "Clear Browsing History"
+- assertVisible: "Clear Saved Pages"
+- takeScreenshot: 05_settings_data
+
+# Navigate back
+- back
+- takeScreenshot: 06_back_to_webview

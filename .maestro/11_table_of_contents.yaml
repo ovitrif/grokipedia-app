@@ -1,0 +1,53 @@
+appId: io.github.grokipedia
+---
+# Table of Contents Test
+# Covers: TOC extraction from article headings
+# Note: Must navigate to an article first (homepage has no headings)
+# Taps on the recent edit card on the homepage to navigate to an article
+
+- launchApp
+
+# Wait for app UI and page to fully load
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: 01_homepage_loaded
+
+# Tap on the recent edit article card (bottom half of visible content)
+# The card with article title + "New edit approved by Grok" text
+- tapOn:
+    point: "40%,68%"
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Wait for the article page to load (the URL should change from homepage)
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 20000
+
+# Give the WebView time to fully render the article
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: 02_article_loaded
+
+# Open TOC via More menu
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Table of Contents"
+    timeout: 5000
+- tapOn: "Table of Contents"
+
+# Wait for TOC sheet to appear (JS needs to extract headings from article)
+- extendedWaitUntil:
+    visible: "Table of Contents"
+    timeout: 15000
+- takeScreenshot: 03_toc_sheet
+
+# Dismiss the TOC sheet
+- back
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 5000
+- takeScreenshot: 04_after_toc_dismiss
