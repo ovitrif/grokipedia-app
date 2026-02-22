@@ -1,0 +1,11 @@
+# Maestro test screenshots (generated during test runs)
+screenshots/
+
+# Maestro recordings (if enabled)
+recordings/
+
+# Maestro reports
+reports/
+
+# Keep baseline screenshots if you want to version them
+# !screenshots/baseline/

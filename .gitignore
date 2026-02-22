@@ -17,3 +17,9 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+# Claude Code - ignore settings but track agents/skills
+.claude/*
+!.claude/agents/
+!.claude/skills/
+composeApp/build/outputs/roborazzi/
+.verification

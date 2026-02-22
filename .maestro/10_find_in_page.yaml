@@ -1,0 +1,38 @@
+appId: io.github.grokipedia
+---
+# Find in Page Test
+# Covers: Find bar opens from overflow menu, placeholder visible, dismiss with back
+
+- launchApp
+
+# Wait for app UI
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- takeScreenshot: 01_app_loaded
+
+# Open Find in Page via More menu
+- tapOn: "More"
+- extendedWaitUntil:
+    visible: "Find in Page"
+    timeout: 5000
+- tapOn: "Find in Page"
+
+# Verify find bar appeared (placeholder text)
+- extendedWaitUntil:
+    visible: "Find in page"
+    timeout: 5000
+- takeScreenshot: 02_find_bar_visible
+
+# Verify navigation buttons are present
+- assertVisible: "Previous match"
+- assertVisible: "Next match"
+- assertVisible: "Close"
+- takeScreenshot: 03_find_bar_controls
+
+# Close find bar by pressing back
+- back
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 5000
+- takeScreenshot: 04_find_closed

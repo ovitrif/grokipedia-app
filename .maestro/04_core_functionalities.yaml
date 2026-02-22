@@ -1,0 +1,45 @@
+appId: io.github.grokipedia
+---
+# Core Functionalities Test
+# Covers:
+# 1. App startup and WebView display
+# 2. Floating button navigation
+# 3. Favorites feature (save page, view saved pages)
+
+- launchApp
+
+# --- Part 1: Startup Verification ---
+# Wait for floating buttons (contentDescription-based)
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+- takeScreenshot: 01_app_loaded
+
+# --- Part 2: Favorites Feature ---
+
+# Save the current page via the star button
+- tapOn: "Save"
+
+# Wait for save confirmation snackbar
+- extendedWaitUntil:
+    visible: "Page saved"
+    timeout: 5000
+- takeScreenshot: 02_page_saved
+
+# Wait for snackbar to fade
+- extendedWaitUntil:
+    notVisible: "Page saved"
+    timeout: 5000
+
+# Navigate to Saved Pages via the bookmarks button
+- tapOn: "Saved Pages"
+
+# Verify Saved Pages screen
+- extendedWaitUntil:
+    visible: "Saved Pages"
+    timeout: 5000
+- takeScreenshot: 03_favorites_list
+
+# Navigate back
+- back
+- takeScreenshot: 04_back_to_webview

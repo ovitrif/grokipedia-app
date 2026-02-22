@@ -1,0 +1,19 @@
+appId: io.github.grokipedia
+---
+# Smoke Test: Launch app and verify core UI elements
+#
+# This test validates:
+# - App launches without crashing
+# - WebView and floating buttons render
+# Note: Uses contentDescription text matching for Compose elements
+
+- launchApp
+
+# Wait for the floating buttons to appear (they render with the Compose UI)
+- extendedWaitUntil:
+    visible: "More"
+    timeout: 30000
+
+- assertVisible: "Home"
+- assertVisible: "Save"
+- takeScreenshot: smoke_test_launch
