@@ -146,6 +146,8 @@ Add logs in Kotlin code using these prefixes (filtered automatically):
 
 ## Output Rules
 
+**App screenshots location**: Save all app screenshots (verification, demo, marketing) to `.ai/screens/`. Never leave screenshots at the repo root.
+
 **Pixel perfection for UI alignment**: When implementing UI changes, always verify visual alignment against reference screenshots. Use exact measurements and compare against existing UI elements (e.g., align floating buttons with existing icons on the page). If a screenshot shows misalignment, fix it before considering the task complete.
 
 **Screenshot paths in final messages**: When implementing features with visual changes, include clickable paths to relevant screenshots in your final summary message:

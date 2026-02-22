@@ -4,6 +4,19 @@ Unofficial app for Grokipedia, so you can forget about Wokipedia!
 
 A Compose Multiplatform mobile application that provides a native wrapper for the Grokipedia website, available on both Android and iOS platforms.
 
+<table>
+  <tr>
+    <td><img src=".ai/screens/01_homepage_loaded.png" width="280"/></td>
+    <td><img src=".ai/screens/02_more_menu.png" width="280"/></td>
+    <td><img src=".ai/screens/03_toc_sheet.png" width="280"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Features</b></td>
+    <td align="center"><b>Reading</b></td>
+  </tr>
+</table>
+
 ## Features
 
 - 🌐 Full WebView integration displaying [Grokipedia.org](https://grokipedia.org)
